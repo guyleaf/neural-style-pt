@@ -145,7 +145,7 @@ Optional dependencies:
 
 After installing the dependencies, you'll need to run the following script to download the VGG model:
 ```
-python models/download_models.py
+python models/scripts/download_models.py
 ```
 This will download the original [VGG-19 model](https://gist.github.com/ksimonyan/3785162f95cd2d5fee77#file-readme-md).
 The original [VGG-16 model](https://gist.github.com/ksimonyan/211839e770f7b538e2d8#file-readme-md) will also be downloaded. By default the original VGG-19 model is used.
