@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # To run this script you'll need to download the ultra-high res
 # scan of Starry Night from the Google Art Project, using this command:
 # wget -c https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg -O starry_night_gigapixel.jpg
