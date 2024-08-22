@@ -9,3 +9,5 @@ dependencies:
   - pytorch-cuda=11.7
   - pytorch=1.13.1
   - torchvision=0.14.1
+  - pip:
+      - pillow
