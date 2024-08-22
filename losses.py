@@ -74,11 +74,11 @@ class StyleLoss(nn.Module):
 
 
 class TVLoss(nn.Module):
-    def __init__(self, strength):
+    def __init__(self, strength: float):
         super(TVLoss, self).__init__()
         self.strength = strength
 
-    def forward(self, input):
+    def forward(self, input: torch.Tensor):
         self.x_diff = input[:, :, 1:, :] - input[:, :, :-1, :]
         self.y_diff = input[:, :, :, 1:] - input[:, :, :, :-1]
         self.loss = self.strength * (

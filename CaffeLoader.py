@@ -3,6 +3,8 @@ from typing import Union
 import torch
 import torch.nn as nn
 
+from utils import print_loadcaffe
+
 
 class VGG(nn.Module):
     def __init__(self, features: nn.Sequential, num_classes: int = 1000):
@@ -376,21 +378,6 @@ def modelSelector(model_file: str, pooling: str):
     else:
         raise ValueError("Model architecture not recognized.")
     return model, model_info
-
-
-# Print like Torch7/loadcaffe
-def print_loadcaffe(model: nn.Sequential, model_info: dict[str, list[str]]):
-    cnn_info = model_info["C"]
-
-    i = 0
-    for layer in model:
-        if isinstance(layer, nn.Conv2d):
-            print(
-                f"{cnn_info[i]}: {layer.out_channels} {layer.in_channels} {layer.kernel_size}"
-            )
-            i += 1
-        if i == len(cnn_info):
-            break
 
 
 # Load the model, and configure pooling layer type
