@@ -25,50 +25,159 @@ def add_options(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "-gpu",
-        help="Zero-indexed ID of the GPU to use; for CPU mode set -gpu = c",
-        default=0,
+        help="Zero-indexed ID of the GPU to use; for CPU mode set -gpu c",
+        type=str,
+        default="0",
     )
 
     # Optimization options
-    parser.add_argument("-content_weight", type=float, default=5e0)
-    parser.add_argument("-style_weight", type=float, default=1e2)
-    parser.add_argument("-normalize_weights", action="store_true")
-    parser.add_argument("-normalize_gradients", action="store_true")
-    parser.add_argument("-tv_weight", type=float, default=1e-3)
+    parser.add_argument(
+        "-content_weight",
+        help="How much to weight the content reconstruction term.",
+        type=float,
+        default=5e0,
+    )
+    parser.add_argument(
+        "-style_weight",
+        help="How much to weight the style reconstruction term.",
+        type=float,
+        default=1e2,
+    )
+    parser.add_argument(
+        "-normalize_weights",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-normalize_gradients",
+        help="Style and content gradients from each layer will be L1 normalized.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-tv_weight",
+        help="Weight of total-variation (TV) regularization; this helps to smooth the image. Set to 0 to disable TV regularization.",
+        type=float,
+        default=1e-3,
+    )
     parser.add_argument("-num_iterations", type=int, default=1000)
-    parser.add_argument("-init", choices=["random", "image"], default="random")
-    parser.add_argument("-init_image", default=None)
-    parser.add_argument("-optimizer", choices=["lbfgs", "adam"], default="lbfgs")
-    parser.add_argument("-learning_rate", type=float, default=1e0)
-    parser.add_argument("-lbfgs_num_correction", type=int, default=100)
+    parser.add_argument(
+        "-init",
+        help="Method for generating the generated image; one of random or image. Default is random which uses a noise initialization as in the paper; image initializes with the content image.",
+        type=str,
+        choices=["random", "image"],
+        default="random",
+    )
+    parser.add_argument(
+        "-init_image",
+        help="Replaces the initialization image with a user specified image.",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-optimizer",
+        help="The optimization algorithm to use; L-BFGS tends to give better results, but uses more memory. Switching to ADAM will reduce memory usage; when using ADAM you will probably need to play with other parameters to get good results, especially the style weight, content weight, and learning rate.",
+        type=str,
+        choices=["lbfgs", "adam"],
+        default="lbfgs",
+    )
+    parser.add_argument(
+        "-learning_rate",
+        help="Learning rate to use with the ADAM optimizer.",
+        type=float,
+        default=1e0,
+    )
+    parser.add_argument(
+        "-lbfgs_num_correction",
+        help="History size of the L-BFGS optimizer.",
+        type=int,
+        default=100,
+    )
 
     # Output options
-    parser.add_argument("-print_iter", type=int, default=50)
-    parser.add_argument("-save_iter", type=int, default=100)
-    parser.add_argument("-output_image", default="out.png")
+    parser.add_argument(
+        "-print_iter",
+        help="Print progress every print_iter iterations. Set to 0 to disable printing.",
+        type=int,
+        default=50,
+    )
+    parser.add_argument(
+        "-save_iter",
+        help="Save the image every save_iter iterations. Set to 0 to disable saving intermediate results.",
+        type=int,
+        default=100,
+    )
+    parser.add_argument(
+        "-output_image", help="Name of the output image.", type=str, default="out.png"
+    )
 
     # Other options
-    parser.add_argument("-style_scale", type=float, default=1.0)
-    parser.add_argument("-original_colors", type=int, choices=[0, 1], default=0)
-    parser.add_argument("-pooling", choices=["avg", "max"], default="max")
-    parser.add_argument("-model_file", type=str, default="models/vgg19-d01eb7cb.pth")
-    parser.add_argument("-disable_check", action="store_true")
+    parser.add_argument(
+        "-style_scale",
+        help="Scale at which to extract features from the style image.",
+        type=float,
+        default=1.0,
+    )
+    parser.add_argument(
+        "-original_colors",
+        help="If you set this to 1, then the output image will keep the colors of the content image.",
+        type=int,
+        choices=[0, 1],
+        default=0,
+    )
+    parser.add_argument(
+        "-pooling",
+        help="The type of pooling layers to use; The VGG-19 models uses max pooling layers, but the paper mentions that replacing these layers with average pooling layers can improve the results. I haven't been able to get good results using average pooling, but the option is here.",
+        type=str,
+        choices=["avg", "max"],
+        default="max",
+    )
+    parser.add_argument(
+        "-model_file",
+        help="Path to the .pth file for the VGG Caffe model.",
+        type=str,
+        default="models/vgg19-d01eb7cb.pth",
+    )
+    parser.add_argument(
+        "-disable_check",
+        help="Whether not to strictly enforce that the keys in :attr:`state_dict` match the keys returned by this module's :meth:`~torch.nn.Module.state_dict` function.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
     parser.add_argument(
         "-backend",
         choices=["nn", "cudnn", "mkl", "mkldnn", "openmp", "mkl,cudnn", "cudnn,mkl"],
         default="nn",
     )
-    parser.add_argument("-cudnn_autotune", action="store_true")
-    parser.add_argument("-seed", type=int, default=-1)
+    parser.add_argument(
+        "-cudnn_autotune",
+        help="When using the cuDNN backend, pass this flag to use the built-in cuDNN autotuner to select the best convolution algorithms for your architecture. This will make the first iteration a bit slower and can take a bit more memory, but may significantly speed up the cuDNN backend.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-seed",
+        help="An integer value that you can specify for repeatable results. By default, -1 is random for each run.",
+        type=int,
+        default=-1,
+    )
 
-    parser.add_argument("-content_layers", help="layers for content", default="relu4_2")
+    parser.add_argument(
+        "-content_layers", help="layers for content", type=str, default="relu4_2"
+    )
     parser.add_argument(
         "-style_layers",
         help="layers for style",
+        type=str,
         default="relu1_1,relu2_1,relu3_1,relu4_1,relu5_1",
     )
 
-    parser.add_argument("-multidevice_strategy", default="4,7,29")
+    parser.add_argument(
+        "-multidevice_strategy",
+        help="A comma-separated list of layer indices at which to split the network when using multiple devices.",
+        type=str,
+        default="4,7,29",
+    )
     return parser
 
 
@@ -80,12 +189,14 @@ def parse_args():
     parser.add_argument(
         "-style_image",
         help="Style target image",
+        type=str,
         default="examples/inputs/seated-nude.jpg",
     )
-    parser.add_argument("-style_blend_weights", default=None)
+    parser.add_argument("-style_blend_weights", type=float, nargs="*", default=None)
     parser.add_argument(
         "-content_image",
         help="Content target image",
+        type=str,
         default="examples/inputs/tubingen.jpg",
     )
     parser = add_options(parser)
