@@ -344,7 +344,7 @@ def setup_optimizer(
 
 # Combine the Y channel of the generated image and the UV/CbCr channels of the
 # content image to perform color-independent style transfer.
-def original_colors(content: Image.Image, generated: Image.Image):
+def retain_original_colors(content: Image.Image, generated: Image.Image):
     content_channels = list(content.convert("YCbCr").split())
     generated_channels = list(generated.convert("YCbCr").split())
     content_channels[0] = generated_channels[0]
@@ -479,7 +479,7 @@ def main(params):
 
             # Maybe perform postprocessing for color-independent style transfer
             if params.original_colors == 1:
-                disp = original_colors(deprocess(content_image.clone()), disp)
+                disp = retain_original_colors(deprocess(content_image.clone()), disp)
 
             disp.save(str(filename))
 
